@@ -1,0 +1,32 @@
+name: RoyalAuth
+main: org.royaldev.royalauth.RoyalAuth
+version: 0.0.1
+website: http://royaldev.org/
+author: jkcclemens
+
+commands:
+  login:
+    description: Logs you in.
+    usage: /<command> [password]
+
+  register:
+    description: Registers you.
+    usage: /<command> [password]
+
+  unregister:
+    description: Unregisters you.
+    usage: /<command> [password]
+
+  logout:
+    description: Logs you out.
+    usage: /<command>
+
+  changepass:
+    description: Changes your password.
+    usage: /<command> [oldpassword] [newpassword]
+    aliases: [changepassword, changep, passwd]
+
+  rauth:
+    description: Admin commands for RoyalAuth.
+    usage: /<command> [?|reload|register [player]|changepass [player] [password]|logout [player]]
+    aliases: [royalauth]

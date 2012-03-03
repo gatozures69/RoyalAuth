@@ -1,0 +1,31 @@
+# MySQL address (leave trailing slash)
+host: "jdbc:mysql://localhost:3306/"
+# Database to use
+database: "db_name"
+# Username for MySQL
+user: "username"
+# Password for MySQL
+password: "password"
+# Prefix for table names in database
+table_prefix: "ra_"
+# Commands to allow when not logged in
+allowed_commands: ["/login", "/register"]
+# Disable plugin if online-mode is true?
+disable_if_online: false
+
+# Sessions for login
+sessions:
+  # Enable sessions?
+  enabled: true
+  # Length in minutes
+  length: 10
+  # Expand session when you log out? Sessions are started when you first execute /login correctly
+  # If this is true, your session is started again when you log out. Example:
+  # false: You log in and play for 5 minutes (length is set to 10), and then you log out. When you log back in
+  # it verifies you by session. You play for 6 more, and you log back out. When you log back in, you
+  # must enter your password.
+  #
+  # true: You log in and play for 11 minutes. You log out. You join after 5 minutes. It verifies you by
+  # session. You play for 20 minutes and log out. You join again after 11 minutes. You must enter your
+  # password.
+  expand_session_on_quit: true
