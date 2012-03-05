@@ -7,6 +7,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.*;
 import org.royaldev.royalauth.RoyalAuth;
@@ -97,14 +98,14 @@ public class RApListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onLogin(PlayerJoinEvent e) {
+    public void onJoin(PlayerJoinEvent e) {
         Player p = e.getPlayer();
         if (plugin.auth.getLocation(p) == null) {
             plugin.auth.setLocation(p, p.getLocation());
         } else {
             plugin.auth.updateLocation(p, p.getLocation());
         }
-        if (plugin.useSessions && plugin.auth.isSessionValid(p, plugin.sessionLength*60000)) {
+        if (plugin.useSessions && plugin.auth.isSessionValid(p, plugin.sessionLength * 60000)) {
             plugin.auth.setLoggedIn(p, true);
             p.sendMessage(ChatColor.BLUE + "Logged in by session.");
             plugin.log.info("[RoyalAuth] " + p.getName() + " logged in via session.");
@@ -118,6 +119,42 @@ public class RApListener implements Listener {
         } else {
             p.sendMessage(ChatColor.RED + "You are not registered!");
             p.sendMessage(ChatColor.RED + "Please register by using /register [password]");
+        }
+    }
+
+    @EventHandler
+    public void onDrop(PlayerDropItemEvent e) {
+        Player p = e.getPlayer();
+        if (!plugin.auth.getLoggedIn(p)) e.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onPickup(PlayerPickupItemEvent e) {
+        Player p = e.getPlayer();
+        if (!plugin.auth.getLoggedIn(p)) e.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onDamageIn(EntityDamageEvent e) {
+        if (!(e.getEntity() instanceof Player)) return;
+        Player p = (Player) e.getEntity();
+        if (!plugin.auth.getLoggedIn(p)) e.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onDamageOut(EntityDamageEvent event) {
+        if (!(event instanceof EntityDamageByEntityEvent)) return;
+        EntityDamageByEntityEvent e = (EntityDamageByEntityEvent) event;
+        if (!(e.getDamager() instanceof Player)) return;
+        Player p = (Player) e.getDamager();
+        if (!plugin.auth.getLoggedIn(p)) e.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onLogin(PlayerLoginEvent e) {
+        for (Player p : plugin.getServer().getOnlinePlayers()) {
+            if (e.getPlayer().getName().equals(p.getName()))
+                e.disallow(PlayerLoginEvent.Result.KICK_OTHER, "Another player is already logged in with that name!");
         }
     }
 
