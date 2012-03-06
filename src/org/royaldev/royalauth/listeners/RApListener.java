@@ -100,16 +100,16 @@ public class RApListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onJoin(PlayerJoinEvent e) {
         Player p = e.getPlayer();
+        if (plugin.useSessions && plugin.auth.isSessionValid(p, plugin.sessionLength * 60000)) {
+            p.sendMessage(ChatColor.BLUE + "Logged in via session.");
+            plugin.log.info("[RoyalAuth] " + p.getName() + " logged in via session.");
+            plugin.auth.setLoggedIn(p, true);
+            return;
+        }
         if (plugin.auth.getLocation(p) == null) {
             plugin.auth.setLocation(p, p.getLocation());
         } else {
             plugin.auth.updateLocation(p, p.getLocation());
-        }
-        if (plugin.useSessions && plugin.auth.isSessionValid(p, plugin.sessionLength * 60000)) {
-            plugin.auth.setLoggedIn(p, true);
-            p.sendMessage(ChatColor.BLUE + "Logged in by session.");
-            plugin.log.info("[RoyalAuth] " + p.getName() + " logged in via session.");
-            return;
         }
         p.teleport(p.getWorld().getSpawnLocation());
         plugin.auth.setLoggedIn(p, false);
@@ -150,10 +150,11 @@ public class RApListener implements Listener {
         if (!plugin.auth.getLoggedIn(p)) e.setCancelled(true);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onLogin(PlayerLoginEvent e) {
-        for (Player p : plugin.getServer().getOnlinePlayers()) {
-            if (e.getPlayer().getName().equals(p.getName()))
+        Player p = e.getPlayer();
+        for (Player o : plugin.getServer().getOnlinePlayers()) {
+            if (p.getName().equals(o.getName()))
                 e.disallow(PlayerLoginEvent.Result.KICK_OTHER, "Another player is already logged in with that name!");
         }
     }

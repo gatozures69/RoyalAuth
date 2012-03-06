@@ -81,7 +81,6 @@ public class RAAuth {
      * @return If player is logged in or not
      */
     public boolean getLoggedIn(Player p) {
-        //Returns true if logged in, false if not
         return login.contains(p);
     }
 
