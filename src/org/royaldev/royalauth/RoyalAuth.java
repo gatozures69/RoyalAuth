@@ -5,6 +5,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.royaldev.royalauth.listeners.RApListener;
 import org.royaldev.royalauth.rcommands.*;
 
+import java.io.File;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -18,22 +19,24 @@ public class RoyalAuth extends JavaPlugin {
     public String user;
     public String pass;
     public String tp;
+    public static String lang;
     public List<String> allowedCommands;
 
     public Boolean disableOn;
     public Boolean useSessions;
     public Boolean expandSession;
-    
+
     public Long sessionLength;
 
     public void loadConfiguration() {
-        this.getConfig().options().copyDefaults(true);
-        this.saveConfig();
+        getConfig().options().copyDefaults(true);
+        saveConfig();
         db = getConfig().getString("database");
         host = getConfig().getString("host");
         user = getConfig().getString("user");
         pass = getConfig().getString("password");
         tp = getConfig().getString("table_prefix");
+        lang = getConfig().getString("lang");
         allowedCommands = getConfig().getStringList("allowed_commands");
 
         disableOn = getConfig().getBoolean("disable_if_online");
@@ -45,10 +48,22 @@ public class RoyalAuth extends JavaPlugin {
 
     public void onEnable() {
 
+        if (!new File(getDataFolder() + File.separator + "config.yml").exists()) saveResource("config.yml", false);
+        if (!new File(getDataFolder() + File.separator + "messages.properties").exists())
+            saveResource("messages.properties", false);
+
         loadConfiguration();
 
+        try {
+            new Language(this);
+        } catch (Exception e) {
+            log.info("[RoyalAuth] Language file not found! Disabling plugin.");
+            getPluginLoader().disablePlugin(this);
+            return;
+        }
+
         if (disableOn && getServer().getOnlineMode()) {
-            setEnabled(false);
+            getPluginLoader().disablePlugin(this);
             log.info("[" + getDescription().getName() + "] Disabled - online mode is active.");
             return;
         }
@@ -77,8 +92,7 @@ public class RoyalAuth extends JavaPlugin {
         log.info("[" + getDescription().getName() + "] v" + getDescription().getVersion() + " disabled.");
         try {
             RAAuth.con.close();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ignored) {
         }
 
     }

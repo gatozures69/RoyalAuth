@@ -1,3 +1,4 @@
+# See the BukkitDev page for config explanation
 # MySQL address (leave trailing slash)
 host: "jdbc:mysql://localhost:3306/"
 # Database to use

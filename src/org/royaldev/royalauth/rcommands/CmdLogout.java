@@ -7,6 +7,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.royaldev.royalauth.RoyalAuth;
 
+import static org.royaldev.royalauth.Language._;
+
 public class CmdLogout implements CommandExecutor {
 
     RoyalAuth plugin;
@@ -19,7 +21,7 @@ public class CmdLogout implements CommandExecutor {
     public boolean onCommand(CommandSender cs, Command cmd, String label, String[] args) {
         if (cmd.getName().equalsIgnoreCase("logout")) {
             if (!(cs instanceof Player)) {
-                cs.sendMessage(ChatColor.RED + "This command is only available to players!");
+                cs.sendMessage(ChatColor.RED + _("ONLY_PLAYERS"));
                 return true;
             }
             Player p = (Player) cs;

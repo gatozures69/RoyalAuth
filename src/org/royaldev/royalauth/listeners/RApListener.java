@@ -14,6 +14,8 @@ import org.royaldev.royalauth.RoyalAuth;
 
 import java.util.Date;
 
+import static org.royaldev.royalauth.Language._;
+
 public class RApListener implements Listener {
 
     RoyalAuth plugin;
@@ -92,7 +94,7 @@ public class RApListener implements Listener {
 
     @EventHandler()
     public void onCommand(PlayerCommandPreprocessEvent e) {
-        for (String s : plugin.allowedCommands) if (e.getMessage().contains(s)) return;
+        for (String s : plugin.allowedCommands) if (e.getMessage().equalsIgnoreCase(s.trim())) return;
         Player p = e.getPlayer();
         if (!plugin.auth.getLoggedIn(p)) e.setCancelled(true);
     }
@@ -101,7 +103,7 @@ public class RApListener implements Listener {
     public void onJoin(PlayerJoinEvent e) {
         Player p = e.getPlayer();
         if (plugin.useSessions && plugin.auth.isSessionValid(p, plugin.sessionLength * 60000)) {
-            p.sendMessage(ChatColor.BLUE + "Logged in via session.");
+            p.sendMessage(ChatColor.BLUE + _("SESSION"));
             plugin.log.info("[RoyalAuth] " + p.getName() + " logged in via session.");
             plugin.auth.setLoggedIn(p, true);
             return;
@@ -114,11 +116,11 @@ public class RApListener implements Listener {
         p.teleport(p.getWorld().getSpawnLocation());
         plugin.auth.setLoggedIn(p, false);
         if (plugin.auth.isInDatabase(p)) {
-            p.sendMessage(ChatColor.RED + "You are not logged in!");
-            p.sendMessage(ChatColor.RED + "Please log in using /login [password]");
+            p.sendMessage(ChatColor.RED + _("NOT_LOGGED"));
+            p.sendMessage(ChatColor.RED + _("PLEASE_LOG"));
         } else {
-            p.sendMessage(ChatColor.RED + "You are not registered!");
-            p.sendMessage(ChatColor.RED + "Please register by using /register [password]");
+            p.sendMessage(ChatColor.RED + _("NOT_REGGED"));
+            p.sendMessage(ChatColor.RED + _("PLEASE_REG"));
         }
     }
 
@@ -155,7 +157,7 @@ public class RApListener implements Listener {
         Player p = e.getPlayer();
         for (Player o : plugin.getServer().getOnlinePlayers()) {
             if (p.getName().equals(o.getName()))
-                e.disallow(PlayerLoginEvent.Result.KICK_OTHER, "Another player is already logged in with that name!");
+                e.disallow(PlayerLoginEvent.Result.KICK_OTHER, _("NAME_USED"));
         }
     }
 

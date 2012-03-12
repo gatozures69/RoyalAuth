@@ -7,6 +7,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.royaldev.royalauth.RoyalAuth;
 
+import static org.royaldev.royalauth.Language._;
+
 public class CmdRegister implements CommandExecutor {
 
     RoyalAuth plugin;
@@ -23,18 +25,18 @@ public class CmdRegister implements CommandExecutor {
                 return false;
             }
             if (!(cs instanceof Player)) {
-                cs.sendMessage(ChatColor.RED + "This command is only available to players!");
+                cs.sendMessage(ChatColor.RED + _("ONLY_PLAYERS"));
                 return true;
             }
             Player p = (Player) cs;
             if (plugin.auth.isInDatabase(p)) {
-                p.sendMessage(ChatColor.RED + "You're already registered!");
+                p.sendMessage(ChatColor.RED + _("ALREADY_REGISTERED"));
                 return true;
             }
             boolean success = plugin.auth.registerPlayer(p, args[0]);
-            if (success) p.sendMessage(ChatColor.BLUE + "Success!");
+            if (success) p.sendMessage(ChatColor.BLUE + _("SUCCESS"));
             if (!success) {
-                p.sendMessage(ChatColor.RED + "Failure!");
+                p.sendMessage(ChatColor.RED + _("FAILURE"));
                 return true;
             }
             plugin.auth.setLoggedIn(p, true);

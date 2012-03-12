@@ -12,6 +12,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
+import static org.royaldev.royalauth.Language._;
+
 @SuppressWarnings("unused")
 
 /**
@@ -371,12 +373,12 @@ public class RAAuth {
         }
         try {
             if (!isInDatabase(p)) {
-                p.sendMessage(ChatColor.RED + "You are not registered!");
+                p.sendMessage(ChatColor.RED + _("NOT_REGISTERED"));
                 return false;
             }
             stmt.execute("DELETE FROM `" + prefix + "users` WHERE `name` = '" + p.getName() + "' AND `password` = '" + password + "';");
         } catch (Exception e) {
-            p.sendMessage(ChatColor.RED + "Could not unregister you!");
+            p.sendMessage(ChatColor.RED + _("NO_UNREGISTER"));
             return false;
         }
         return true;
@@ -427,13 +429,13 @@ public class RAAuth {
         }
         try {
             if (isInDatabase(p)) {
-                p.sendMessage(ChatColor.RED + "You are already registered!");
+                p.sendMessage(ChatColor.RED + _("ALREADY_REG"));
                 return false;
             }
             stmt.execute("INSERT INTO `" + prefix + "users` VALUES ('" + p.getName() + "', '" + password + "', '" + new Date().getTime() + "', '" + p.getAddress().getAddress().toString().replace("/", "") + "');");
         } catch (Exception e) {
             e.printStackTrace();
-            p.sendMessage(ChatColor.RED + "Could not register you!");
+            p.sendMessage(ChatColor.RED + _("NO_REGISTER"));
             return false;
         }
         return true;

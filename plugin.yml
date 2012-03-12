@@ -13,6 +13,7 @@ commands:
   register:
     description: Registers you.
     usage: /<command> [password]
+    aliases: [rregister]
 
   unregister:
     description: Unregisters you.

@@ -30,6 +30,7 @@
         <mkdir dir="${dist}"/>
         <jar jarfile="${dist}/lib/${label}.jar">
             <fileset dir="${build}"/>
+            <fileset dir="mess"/>
             <fileset file="plugin.yml"/>
             <fileset file="config.yml"/>
             <fileset file="LICENSE"/>

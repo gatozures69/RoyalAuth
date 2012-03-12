@@ -10,6 +10,8 @@ import org.royaldev.royalauth.RoyalAuth;
 
 import java.util.Date;
 
+import static org.royaldev.royalauth.Language._;
+
 public class CmdLogin implements CommandExecutor {
 
     RoyalAuth plugin;
@@ -26,17 +28,17 @@ public class CmdLogin implements CommandExecutor {
                 return false;
             }
             if (!(cs instanceof Player)) {
-                cs.sendMessage(ChatColor.RED + "This command is only available to players!");
+                cs.sendMessage(ChatColor.RED + _("ONLY_PLAYERS"));
                 return true;
             }
             Player p = (Player) cs;
             if (plugin.auth.getLoggedIn(p)) {
-                p.sendMessage(ChatColor.RED + "You're already logged in!");
+                p.sendMessage(ChatColor.RED + _("ALREADY_LOGGED_IN"));
                 return true;
             }
-            if (plugin.auth.checkPassword(p, args[0])) p.sendMessage(ChatColor.BLUE + "Success!");
+            if (plugin.auth.checkPassword(p, args[0])) p.sendMessage(ChatColor.BLUE + _("SUCCESS"));
             else {
-                p.sendMessage(ChatColor.RED + "Incorrect password!");
+                p.sendMessage(ChatColor.RED + _("WRONG_PASS"));
                 plugin.log.warning("[RoyalAuth] " + p.getName() + " used the wrong password!");
                 return true;
             }

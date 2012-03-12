@@ -5,6 +5,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.royaldev.royalauth.Language;
 import org.royaldev.royalauth.RoyalAuth;
 
 public class CmdRAuth implements CommandExecutor {
@@ -60,6 +61,7 @@ public class CmdRAuth implements CommandExecutor {
                 return true;
             } else if (command.equalsIgnoreCase("reload")) {
                 plugin.loadConfiguration();
+                Language.reload();
                 cs.sendMessage(ChatColor.BLUE + "Configuration reloaded.");
                 return true;
             } else if (command.toLowerCase().startsWith("logout")) {
