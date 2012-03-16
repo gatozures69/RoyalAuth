@@ -14,7 +14,7 @@ userdb_name: "users"
 # Name of the locations table
 locationdb_name: "locations"
 # Commands to allow when not logged in
-allowed_commands: ["/login", "/register"]
+allowed_commands: ["/login", "/l", "/register"]
 # Disable plugin if online-mode is true?
 disable_if_online: false
 # Encryption type (RAUTH, SHA-512, SHA-256, MD5, etc - any type supported by Java)
