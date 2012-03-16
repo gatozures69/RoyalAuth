@@ -41,7 +41,7 @@ public class CmdRAuth implements CommandExecutor {
                 }
                 String name = args[1];
                 String pass = args[2];
-                boolean success = plugin.auth.registerPlayer(name, pass);
+                boolean success = plugin.auth.registerPlayer(name, pass, RoyalAuth.type);
                 if (success)
                     cs.sendMessage(ChatColor.BLUE + "Registered " + ChatColor.GRAY + name + ChatColor.BLUE + " successfully.");
                 if (!success)
@@ -55,7 +55,7 @@ public class CmdRAuth implements CommandExecutor {
                 }
                 String name = args[1];
                 String pass = args[2];
-                boolean success = plugin.auth.changePassword(name, pass);
+                boolean success = plugin.auth.changePassword(name, pass, RoyalAuth.type);
                 if (success) cs.sendMessage(ChatColor.BLUE + "Password changed.");
                 if (!success) cs.sendMessage(ChatColor.RED + "Could not change password.");
                 return true;

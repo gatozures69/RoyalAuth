@@ -36,7 +36,7 @@ public class CmdLogin implements CommandExecutor {
                 p.sendMessage(ChatColor.RED + _("ALREADY_LOGGED_IN"));
                 return true;
             }
-            if (plugin.auth.checkPassword(p, args[0])) p.sendMessage(ChatColor.BLUE + _("SUCCESS"));
+            if (plugin.auth.checkPassword(p, args[0], RoyalAuth.type)) p.sendMessage(ChatColor.BLUE + _("SUCCESS"));
             else {
                 p.sendMessage(ChatColor.RED + _("WRONG_PASS"));
                 plugin.log.warning("[RoyalAuth] " + p.getName() + " used the wrong password!");

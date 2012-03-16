@@ -29,7 +29,7 @@ public class CmdUnregister implements CommandExecutor {
                 return true;
             }
             Player p = (Player) cs;
-            boolean success = plugin.auth.removePlayer(p, args[0]);
+            boolean success = plugin.auth.removePlayer(p, args[0], RoyalAuth.type);
             plugin.auth.setLoggedIn(p, false);
             if (success) p.sendMessage(ChatColor.BLUE + _("SUCCESS"));
             return true;

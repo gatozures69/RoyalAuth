@@ -34,11 +34,11 @@ public class CmdChangePass implements CommandExecutor {
             Player p = (Player) cs;
             String oldPass = args[0];
             String newPass = args[1];
-            if (!plugin.auth.checkPassword(p, oldPass)) {
+            if (!plugin.auth.checkPassword(p, oldPass, RoyalAuth.type)) {
                 cs.sendMessage(ChatColor.RED + _("WRONG_PASS"));
                 return true;
             }
-            boolean success = plugin.auth.changePassword(p, newPass);
+            boolean success = plugin.auth.changePassword(p, newPass, RoyalAuth.type);
             if (success) cs.sendMessage(ChatColor.BLUE + _("PASS_CHANGE"));
             if (!success) cs.sendMessage(ChatColor.RED + _("NO_PASS_CHNG"));
             return true;

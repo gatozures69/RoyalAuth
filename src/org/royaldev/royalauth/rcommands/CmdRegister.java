@@ -33,7 +33,7 @@ public class CmdRegister implements CommandExecutor {
                 p.sendMessage(ChatColor.RED + _("ALREADY_REGISTERED"));
                 return true;
             }
-            boolean success = plugin.auth.registerPlayer(p, args[0]);
+            boolean success = plugin.auth.registerPlayer(p, args[0], RoyalAuth.type);
             if (success) p.sendMessage(ChatColor.BLUE + _("SUCCESS"));
             if (!success) {
                 p.sendMessage(ChatColor.RED + _("FAILURE"));
