@@ -23,6 +23,8 @@ public class RAAuth {
 
     Statement stmt;
     String prefix;
+    String namedb;
+    String locdb;
     static Connection con;
 
     /**
@@ -33,10 +35,14 @@ public class RAAuth {
      * @param password Password for user
      * @param database Database name in MySQL
      * @param prefix   Prefix for tables in the database
+     * @param namedb   Name of user database
+     * @param locdb    Name of location database
      */
-    public RAAuth(String url, String user, String password, String database, String prefix) {
+    public RAAuth(String url, String user, String password, String database, String prefix, String namedb, String locdb) {
 
         this.prefix = prefix;
+        this.namedb = namedb;
+        this.locdb = locdb;
 
         Logger log = Logger.getLogger("Minecraft");
         try {
@@ -48,19 +54,10 @@ public class RAAuth {
             con = null;
         }
 
-        /*try {
-            stmt.execute("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = `" + database + "`;");
-        } catch (Exception e) {
-            plugin.getServer().getPluginManager().disablePlugin(ra);
-            log.severe("[RoyalAuth] Database did not exist!");
-            e.printStackTrace();
-        }
-        */
-
         try {
             stmt.execute("USE `" + database + "`;");
-            stmt.execute("CREATE TABLE IF NOT EXISTS `" + prefix + "users` (name text, password text, date long, ip text);");
-            stmt.execute("CREATE TABLE IF NOT EXISTS `" + prefix + "locations` (name text, world text, x int, y int, z int, pitch float, yaw float);");
+            stmt.execute("CREATE TABLE IF NOT EXISTS `" + prefix + namedb + "` (name text, password text, date long, ip text);");
+            stmt.execute("CREATE TABLE IF NOT EXISTS `" + prefix + locdb + "` (name text, world text, x int, y int, z int, pitch float, yaw float);");
         } catch (Exception e) {
             log.severe("[RoyalAuth] Could not create tables!");
             e.printStackTrace();
@@ -99,7 +96,7 @@ public class RAAuth {
     public void setLoggedIn(Player p, boolean status) {
         if (status) {
             login.add(p);
-            String sql = "UPDATE `" + prefix + "users` SET ip ='" + p.getAddress().getAddress().toString().replace("/", "") + "' WHERE name = '" + p.getName() + "';";
+            String sql = "UPDATE `" + prefix + namedb + "` SET ip ='" + p.getAddress().getAddress().toString().replace("/", "") + "' WHERE name = '" + p.getName() + "';";
             if (con == null) return;
             try {
                 stmt.execute(sql);
@@ -122,7 +119,7 @@ public class RAAuth {
         if (con == null) return false;
         ResultSet success;
         try {
-            success = stmt.executeQuery("SELECT * FROM `" + prefix + "users` WHERE `name` = '" + p.getName() + "';");
+            success = stmt.executeQuery("SELECT * FROM `" + prefix + namedb + "` WHERE `name` = '" + p.getName() + "';");
             return success.absolute(1);
         } catch (Exception e) {
             return false;
@@ -140,7 +137,7 @@ public class RAAuth {
         if (con == null) return false;
         ResultSet success;
         try {
-            success = stmt.executeQuery("SELECT * FROM `" + prefix + "users` WHERE name = '" + name + "';");
+            success = stmt.executeQuery("SELECT * FROM `" + prefix + namedb + "` WHERE name = '" + name + "';");
             return success.absolute(1);
         } catch (Exception e) {
             return false;
@@ -153,19 +150,20 @@ public class RAAuth {
      *
      * @param name Name of player to change password for
      * @param pass New password
+     * @param type Encryption type
      * @return true if password was changed, false if it wasn't
      */
-    public boolean changePassword(String name, String pass) {
+    public boolean changePassword(String name, String pass, String type) {
         if (con == null) return false;
         String password;
         try {
-            password = RASha.encrypt(pass);
+            password = RASha.encrypt(pass, type);
         } catch (Exception e) {
             return false;
         }
         try {
             if (!isInDatabase(name)) return false;
-            stmt.execute("UPDATE `" + prefix + "users` SET password = '" + password + "' WHERE name = '" + name + "';"); // <- fix
+            stmt.execute("UPDATE `" + prefix + namedb + "` SET password = '" + password + "' WHERE name = '" + name + "';"); // <- fix
             return true;
         } catch (Exception e) {
             return false;
@@ -179,19 +177,20 @@ public class RAAuth {
      *
      * @param p    Player to change password for
      * @param pass New password
+     * @param type Encryption type
      * @return true if password was changed, false if it wasn't
      */
-    public boolean changePassword(Player p, String pass) {
+    public boolean changePassword(Player p, String pass, String type) {
         if (con == null) return false;
         String password;
         try {
-            password = RASha.encrypt(pass);
+            password = RASha.encrypt(pass, type);
         } catch (Exception e) {
             return false;
         }
         try {
             if (!isInDatabase(p)) return false;
-            stmt.execute("UPDATE `" + prefix + "users` SET password = '" + password + "' WHERE name = '" + p.getName() + "';"); // <- fix
+            stmt.execute("UPDATE `" + prefix + namedb + "` SET password = '" + password + "' WHERE name = '" + p.getName() + "';"); // <- fix
             return true;
         } catch (Exception e) {
             return false;
@@ -209,7 +208,7 @@ public class RAAuth {
      * @return true if location was set, false if not
      */
     public boolean setLocation(String name, Location loc) {
-        String sql = String.format("INSERT INTO `" + prefix + "locations` VALUES ('%s', '%s', %s, %s, %s, %s, %s);",
+        String sql = String.format("INSERT INTO `" + prefix + locdb + "` VALUES ('%s', '%s', %s, %s, %s, %s, %s);",
                 name,
                 loc.getWorld().getName(),
                 loc.getX(),
@@ -232,7 +231,7 @@ public class RAAuth {
      * @return true if location was updated, false if not
      */
     public boolean updateLocation(String name, Location loc) {
-        String sql = String.format("UPDATE `" + prefix + "locations` SET world = '%s', x = %s, y = %s, z = %s, pitch = %s, yaw = %s WHERE name = '%s';",
+        String sql = String.format("UPDATE `" + prefix + locdb + "` SET world = '%s', x = %s, y = %s, z = %s, pitch = %s, yaw = %s WHERE name = '%s';",
                 loc.getWorld().getName(),
                 loc.getX(),
                 loc.getY(),
@@ -259,7 +258,7 @@ public class RAAuth {
      * @return true if location was set, false if not
      */
     public boolean setLocation(Player p, Location loc) {
-        String sql = String.format("INSERT INTO `" + prefix + "locations` VALUES ('%s', '%s', %s, %s, %s, %s, %s);",
+        String sql = String.format("INSERT INTO `" + prefix + locdb + "` VALUES ('%s', '%s', %s, %s, %s, %s, %s);",
                 p.getName(),
                 loc.getWorld().getName(),
                 loc.getX(),
@@ -282,7 +281,7 @@ public class RAAuth {
      * @return The location the player will be sent to
      */
     public Location getLocation(String name) {
-        String sql = "SELECT * FROM `" + prefix + "locations` WHERE name = '" + name + "';";
+        String sql = "SELECT * FROM `" + prefix + locdb + "` WHERE name = '" + name + "';";
         Location l;
         try {
             ResultSet r = stmt.executeQuery(sql);
@@ -310,7 +309,7 @@ public class RAAuth {
      * @return The location the player will be sent to
      */
     public Location getLocation(Player p) {
-        String sql = "SELECT * FROM `" + prefix + "locations` WHERE name = '" + p.getName() + "';";
+        String sql = "SELECT * FROM `" + prefix + locdb + "` WHERE name = '" + p.getName() + "';";
         Location l;
         try {
             ResultSet r = stmt.executeQuery(sql);
@@ -339,7 +338,7 @@ public class RAAuth {
      * @return true if location was updated, false if not
      */
     public boolean updateLocation(Player p, Location loc) {
-        String sql = String.format("UPDATE `" + prefix + "locations` SET world = '%s', x = %s, y = %s, z = %s, pitch = %s, yaw = %s WHERE name = '%s';",
+        String sql = String.format("UPDATE `" + prefix + locdb + "` SET world = '%s', x = %s, y = %s, z = %s, pitch = %s, yaw = %s WHERE name = '%s';",
                 loc.getWorld().getName(),
                 loc.getX(),
                 loc.getY(),
@@ -361,13 +360,14 @@ public class RAAuth {
      *
      * @param p    Player to remove from database
      * @param pass Player's password
+     * @param type Encryption type
      * @return true if player was removed, false if not
      */
-    public boolean removePlayer(Player p, String pass) {
+    public boolean removePlayer(Player p, String pass, String type) {
         if (con == null) return false;
         String password;
         try {
-            password = RASha.encrypt(pass);
+            password = RASha.encrypt(pass, type);
         } catch (Exception e) {
             return false;
         }
@@ -376,7 +376,7 @@ public class RAAuth {
                 p.sendMessage(ChatColor.RED + _("NOT_REGISTERED"));
                 return false;
             }
-            stmt.execute("DELETE FROM `" + prefix + "users` WHERE `name` = '" + p.getName() + "' AND `password` = '" + password + "';");
+            stmt.execute("DELETE FROM `" + prefix + namedb + "` WHERE `name` = '" + p.getName() + "' AND `password` = '" + password + "';");
         } catch (Exception e) {
             p.sendMessage(ChatColor.RED + _("NO_UNREGISTER"));
             return false;
@@ -389,13 +389,14 @@ public class RAAuth {
      *
      * @param name Name of player to insert into database
      * @param pass Password for the new player
+     * @param type Encryption type
      * @return true if inserted, false if not
      */
-    public boolean registerPlayer(String name, String pass) {
+    public boolean registerPlayer(String name, String pass, String type) {
         if (con == null) return false;
         String password;
         try {
-            password = RASha.encrypt(pass);
+            password = RASha.encrypt(pass, type);
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -404,7 +405,7 @@ public class RAAuth {
             if (isInDatabase(name)) {
                 return false;
             }
-            stmt.execute("INSERT INTO `" + prefix + "users` VALUES ('" + name + "', '" + password + "', '" + new Date().getTime() + "', '1';");
+            stmt.execute("INSERT INTO `" + prefix + namedb + "` VALUES ('" + name + "', '" + password + "', '" + new Date().getTime() + "', '1';");
         } catch (Exception e) {
             return false;
         }
@@ -416,13 +417,14 @@ public class RAAuth {
      *
      * @param p    Player to insert into database
      * @param pass Password for the new player
+     * @param type Encryption type
      * @return true if inserted, false if not
      */
-    public boolean registerPlayer(Player p, String pass) {
+    public boolean registerPlayer(Player p, String pass, String type) {
         if (con == null) return false;
         String password;
         try {
-            password = RASha.encrypt(pass);
+            password = RASha.encrypt(pass, type);
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -432,7 +434,7 @@ public class RAAuth {
                 p.sendMessage(ChatColor.RED + _("ALREADY_REG"));
                 return false;
             }
-            stmt.execute("INSERT INTO `" + prefix + "users` VALUES ('" + p.getName() + "', '" + password + "', '" + new Date().getTime() + "', '" + p.getAddress().getAddress().toString().replace("/", "") + "');");
+            stmt.execute("INSERT INTO `" + prefix + namedb + "` VALUES ('" + p.getName() + "', '" + password + "', '" + new Date().getTime() + "', '" + p.getAddress().getAddress().toString().replace("/", "") + "');");
         } catch (Exception e) {
             e.printStackTrace();
             p.sendMessage(ChatColor.RED + _("NO_REGISTER"));
@@ -446,14 +448,15 @@ public class RAAuth {
      *
      * @param p    Player to check password on
      * @param pass Password to check
+     * @param type Encryption type
      * @return true if password was correct, false if not
      */
-    public boolean checkPassword(Player p, String pass) {
+    public boolean checkPassword(Player p, String pass, String type) {
         if (con == null) return false;
         ResultSet rs;
         String password = null;
         try {
-            rs = stmt.executeQuery("SELECT * FROM `" + prefix + "users` WHERE name = '" + p.getName() + "';");
+            rs = stmt.executeQuery("SELECT * FROM `" + prefix + namedb + "` WHERE name = '" + p.getName() + "';");
             if (rs.absolute(1)) {
                 password = rs.getString("password");
             }
@@ -462,7 +465,7 @@ public class RAAuth {
         }
         String input;
         try {
-            input = RASha.encrypt(pass);
+            input = RASha.encrypt(pass, type);
         } catch (Exception e) {
             return false;
         }
@@ -480,7 +483,7 @@ public class RAAuth {
         if (con == null) return false;
         long dates;
         String ip;
-        String sql = "SELECT * FROM `" + prefix + "users` WHERE name = '" + p.getName() + "';";
+        String sql = "SELECT * FROM `" + prefix + namedb + "` WHERE name = '" + p.getName() + "';";
         try {
             ResultSet rs = stmt.executeQuery(sql);
             boolean success = rs.absolute(1);
@@ -505,7 +508,7 @@ public class RAAuth {
      */
     public boolean setLoginDate(String name, long time) {
         if (con == null) return false;
-        String sql = "UPDATE `" + prefix + "users` SET date = '" + time + "' WHERE name = '" + name + "';";
+        String sql = "UPDATE `" + prefix + namedb + "` SET date = '" + time + "' WHERE name = '" + name + "';";
         try {
             return stmt.execute(sql);
         } catch (Exception e) {
@@ -522,7 +525,7 @@ public class RAAuth {
      */
     public boolean setLoginDate(Player p, long time) {
         if (con == null) return false;
-        String sql = "UPDATE `" + prefix + "users` SET date = '" + time + "' WHERE name = '" + p.getName() + "';";
+        String sql = "UPDATE `" + prefix + namedb + "` SET date = '" + time + "' WHERE name = '" + p.getName() + "';";
         try {
             return stmt.execute(sql);
         } catch (Exception e) {

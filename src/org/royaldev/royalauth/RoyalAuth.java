@@ -19,7 +19,10 @@ public class RoyalAuth extends JavaPlugin {
     public String user;
     public String pass;
     public String tp;
+    public String namedb;
+    public String locdb;
     public static String lang;
+    public static String type;
     public List<String> allowedCommands;
 
     public Boolean disableOn;
@@ -36,7 +39,11 @@ public class RoyalAuth extends JavaPlugin {
         user = getConfig().getString("user");
         pass = getConfig().getString("password");
         tp = getConfig().getString("table_prefix");
+        namedb = getConfig().getString("userdb_name");
+        locdb = getConfig().getString("locationdb_name");
         lang = getConfig().getString("lang");
+        type = getConfig().getString("encryption_type");
+        
         allowedCommands = getConfig().getStringList("allowed_commands");
 
         disableOn = getConfig().getBoolean("disable_if_online");
@@ -68,7 +75,7 @@ public class RoyalAuth extends JavaPlugin {
             return;
         }
 
-        auth = new RAAuth(host + db, user, pass, db, tp);
+        auth = new RAAuth(host + db, user, pass, db, tp, namedb, locdb);
 
         PluginManager pm = getServer().getPluginManager();
 

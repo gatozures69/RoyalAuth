@@ -3,10 +3,29 @@ package org.royaldev.royalauth;
 import java.security.MessageDigest;
 
 public class RASha {
-    
-    private static String hash(String data) throws Exception {
 
-        MessageDigest md = MessageDigest.getInstance("SHA-512");
+    private static String getType(String type) {
+        if (type.equalsIgnoreCase("md5")) {
+            return "MD5";
+        } else if (type.equalsIgnoreCase("sha-512") || type.equalsIgnoreCase("sha512")) {
+            return "SHA-512";
+        } else if (type.equalsIgnoreCase("sha-256") || type.equalsIgnoreCase("sha256")) {
+            return "SHA-256";
+        } else if (type.equalsIgnoreCase("rauth")) {
+            return "RAUTH";
+        } else {
+            return type;
+        }
+    }
+
+    private static String hash(String data, String type) throws Exception {
+
+        String rtype = getType(type);
+        if (rtype.equals("RAUTH")) {
+            rtype = "SHA-512";
+        }
+
+        MessageDigest md = MessageDigest.getInstance(rtype);
         md.update(data.getBytes());
 
         byte byteData[] = md.digest();
@@ -17,13 +36,21 @@ public class RASha {
         }
         return sb.toString();
     }
-    
-    public static String encrypt(String data) throws Exception {
 
-        for (int i = 0; i < 25; i++) {
-            data = hash(data);
+    public static String encrypt(String data, String type) throws Exception {
+
+        String rtype = getType(type);
+
+        if (rtype.equals("RAUTH")) {
+
+            for (int i = 0; i < 25; i++) {
+                data = hash(data, rtype);
+            }
+
+            return data;
+
+        } else {
+            return hash(data, rtype);
         }
-
-        return data;
     }
 }

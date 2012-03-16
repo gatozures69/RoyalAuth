@@ -9,10 +9,16 @@ user: "username"
 password: "password"
 # Prefix for table names in database
 table_prefix: "ra_"
+# Name of the user table
+userdb_name: "users"
+# Name of the locations table
+locationdb_name: "locations"
 # Commands to allow when not logged in
 allowed_commands: ["/login", "/register"]
 # Disable plugin if online-mode is true?
 disable_if_online: false
+# Encryption type (RAUTH, SHA-512, SHA-256, MD5, etc - any type supported by Java)
+encryption_type: "RAUTH"
 
 # Sessions for login
 sessions:
