@@ -5,6 +5,7 @@ import java.security.MessageDigest;
 public class RASha {
 
     private static String getType(String type) {
+        type = type.trim();
         if (type.equalsIgnoreCase("md5")) {
             return "MD5";
         } else if (type.equalsIgnoreCase("sha-512") || type.equalsIgnoreCase("sha512")) {

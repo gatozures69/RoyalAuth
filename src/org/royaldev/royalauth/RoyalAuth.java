@@ -6,6 +6,9 @@ import org.royaldev.royalauth.listeners.RApListener;
 import org.royaldev.royalauth.rcommands.*;
 
 import java.io.File;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -43,7 +46,7 @@ public class RoyalAuth extends JavaPlugin {
         locdb = getConfig().getString("locationdb_name");
         lang = getConfig().getString("lang");
         type = getConfig().getString("encryption_type");
-        
+
         allowedCommands = getConfig().getStringList("allowed_commands");
 
         disableOn = getConfig().getBoolean("disable_if_online");
@@ -76,6 +79,23 @@ public class RoyalAuth extends JavaPlugin {
         }
 
         auth = new RAAuth(host + db, user, pass, db, tp, namedb, locdb);
+
+        final String user2 = user;
+        final String url2 = host + db;
+        final String pass2 = pass;
+        Runnable pinger = new Runnable() {
+            public void run() {
+                try {
+                    Connection con = DriverManager.getConnection(url2, user2, pass2);
+                    Statement stmt = con.createStatement();
+                    stmt.execute("/* ping */ SELECT 1");
+                    con.close();
+                } catch (Exception ignored) {
+                }
+            }
+        };
+
+        getServer().getScheduler().scheduleAsyncDelayedTask(this, pinger, 3600);
 
         PluginManager pm = getServer().getPluginManager();
 

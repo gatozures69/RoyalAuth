@@ -94,7 +94,10 @@ public class RApListener implements Listener {
 
     @EventHandler()
     public void onCommand(PlayerCommandPreprocessEvent e) {
-        for (String s : plugin.allowedCommands) if (e.getMessage().equalsIgnoreCase(s.trim())) return;
+        for (String s : plugin.allowedCommands) {
+            s = s.trim().toLowerCase();
+            if (e.getMessage().startsWith(s + " ") || e.getMessage().equalsIgnoreCase(s)) return;
+        }
         Player p = e.getPlayer();
         if (!plugin.auth.getLoggedIn(p)) e.setCancelled(true);
     }
@@ -106,21 +109,22 @@ public class RApListener implements Listener {
             p.sendMessage(ChatColor.BLUE + _("SESSION"));
             plugin.log.info("[RoyalAuth] " + p.getName() + " logged in via session.");
             plugin.auth.setLoggedIn(p, true);
-            return;
-        }
-        if (plugin.auth.getLocation(p) == null) {
-            plugin.auth.setLocation(p, p.getLocation());
+            plugin.auth.setLoginDate(p, new Date().getTime());
         } else {
-            plugin.auth.updateLocation(p, p.getLocation());
-        }
-        p.teleport(p.getWorld().getSpawnLocation());
-        plugin.auth.setLoggedIn(p, false);
-        if (plugin.auth.isInDatabase(p)) {
-            p.sendMessage(ChatColor.RED + _("NOT_LOGGED"));
-            p.sendMessage(ChatColor.RED + _("PLEASE_LOG"));
-        } else {
-            p.sendMessage(ChatColor.RED + _("NOT_REGGED"));
-            p.sendMessage(ChatColor.RED + _("PLEASE_REG"));
+            if (plugin.auth.getLocation(p) == null) {
+                plugin.auth.setLocation(p, p.getLocation());
+            } else {
+                plugin.auth.updateLocation(p, p.getLocation());
+            }
+            p.teleport(p.getWorld().getSpawnLocation());
+            plugin.auth.setLoggedIn(p, false);
+            if (plugin.auth.isInDatabase(p)) {
+                p.sendMessage(ChatColor.RED + _("NOT_LOGGED"));
+                p.sendMessage(ChatColor.RED + _("PLEASE_LOG"));
+            } else {
+                p.sendMessage(ChatColor.RED + _("NOT_REGGED"));
+                p.sendMessage(ChatColor.RED + _("PLEASE_REG"));
+            }
         }
     }
 

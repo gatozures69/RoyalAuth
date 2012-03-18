@@ -27,6 +27,8 @@ public class RAAuth {
     String locdb;
     static Connection con;
 
+    Logger log = Logger.getLogger("Minecraft");
+    
     /**
      * Main method for API functions
      *
