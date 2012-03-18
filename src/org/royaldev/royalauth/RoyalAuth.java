@@ -95,7 +95,7 @@ public class RoyalAuth extends JavaPlugin {
             }
         };
 
-        getServer().getScheduler().scheduleAsyncDelayedTask(this, pinger, 3600);
+        getServer().getScheduler().scheduleAsyncRepeatingTask(this, pinger, 0, 3600);
 
         PluginManager pm = getServer().getPluginManager();
 
