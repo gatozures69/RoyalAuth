@@ -1,18 +1,18 @@
 # See the BukkitDev page for config explanation
 # MySQL address (leave trailing slash)
-host: "jdbc:mysql://localhost:3306/"
+host: "http://mysql2.000webhost.com"
 # Database to use
-database: "db_name"
+database: "a4849714_mine"
 # Username for MySQL
-user: "username"
+user: "a4849714_mine"
 # Password for MySQL
-password: "password"
+password: "ferreira94mine"
 # Prefix for table names in database
 table_prefix: "ra_"
 # Name of the user table
-userdb_name: "users"
+userdb_name: "a4849714_mine"
 # Name of the locations table
-locationdb_name: "locations"
+locationdb_name: "a4849714_mine"
 # Commands to allow when not logged in
 allowed_commands: ["/login", "/l", "/register"]
 # Disable plugin if online-mode is true?
